@@ -1,0 +1,100 @@
+plugins {
+	id 'org.jetbrains.kotlin.plugin.jpa' version '1.3.20'
+	id 'org.springframework.boot' version '2.1.3.RELEASE'
+	id 'org.jetbrains.kotlin.jvm' version '1.3.20'
+	id 'org.jetbrains.kotlin.plugin.spring' version '1.3.20'
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-jpa'
+apply plugin: 'kotlin-spring'
+apply plugin: 'eclipse'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'devlium'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '10'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	
+	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+	runtimeOnly 'com.h2database:h2'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.12.0'
+}
+
+compileKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict']
+		jvmTarget = '1.8'
+	}
+}
+
+compileTestKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict']
+		jvmTarget = '1.8'
+	}
+}
+
+/* 
+ This fixes the eclipse project! 
+ containers: See: https://stackoverflow.com/questions/44266042/kotlin-setup-via-gradle-on-eclipse
+ cla
+*/
+eclipse {
+    classpath {
+    	//Adds the kotlin container to the classpath
+        containers 'org.jetbrains.kotlin.core.KOTLIN_CONTAINER'
+        //Fixes the right output path
+		defaultOutputDir = file('bin')
+		//Make all src folders output in the same output folder (default)
+		file {
+    		whenMerged { 
+		    	// use default Output for all source-folders. see also defaultOutputDir per project
+	        	entries.each { source ->
+	        		// only Source-folders in the project starting with '/' are project-references
+					if (source.kind == 'src' && !source.path.startsWith('/')) { 
+						source.output = null
+	    			}
+				}
+		    }
+		}
+    }
+    
+    
+    project{
+    	buildCommand 'org.jetbrains.kotlin.ui.kotlinBuilder'
+    	//Fixes the natures
+    	natures 'org.jetbrains.kotlin.core.kotlinNature'
+	    natures 'org.eclipse.jdt.core.javanature'
+	    //Links the kotlin_bin folder (generated class files)
+        linkedResource name: 'kotlin_bin', type: '2', locationUri: "org.jetbrains.kotlin.core.filesystem:/${project.name}/kotlin_bin".toString()
+        file{
+        	whenMerged{
+		    	def kotlinPrefs = file('.settings/org.jetbrains.kotlin.core.prefs')
+		    	def jdkHome = System.properties.'java.home'
+		    	if(!(jdkHome)){
+		    		throw new GradleException('No JDK home available for setting up Eclipse Kotlin plugin, setup env "java.home" or update this script.')
+		    	}
+		    	kotlinPrefs.write """\
+			        codeStyle/codeStyleId=KOTLIN_OFFICIAL
+			        codeStyle/globalsOverridden=true
+			        compilerPlugins/jpa/active=true
+			        compilerPlugins/no-arg/active=true
+			        compilerPlugins/spring/active=true
+			        eclipse.preferences.version=1
+			        globalsOverridden=true
+			        jdkHome=$jdkHome
+		    	""".stripIndent()
+        	}
+        }
+    }
+}
