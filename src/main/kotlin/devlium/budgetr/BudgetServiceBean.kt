@@ -24,7 +24,19 @@ class BudgetServiceBean {
 		
 		return Budget(period, total, applicableExpenses)
 	}
+	
+	fun forecast(startPeriod : Period, forecastLength : Int) : Forecast{
+		val budgets = startPeriod.iterator(forecastLength).asSequence().map {
+			project(it)
+		}.toList()
+		
+		return Forecast(forecastLength, budgets.map{it.total}.sum() , budgets)
+	}
 }
+
+data class Forecast(val forecastLength: Int,
+					val total: Double,
+					val budgets : List<Budget>)
 
 data class Budget(	val period: Period,
 				  	val total:Double,
@@ -37,6 +49,22 @@ data class Period(val start:LocalDate, val end:LocalDate){
 	fun next() : Period{
 		val s = end.plusDays(1)
 		return Period(s, s.plusDays(ChronoUnit.DAYS.between(start, end)))
+	}
+	
+	fun iterator(length:Int) : Iterator<Period>{
+		return object:Iterator<Period>{
+			var current = this@Period
+			var remaining = length
+			
+			override fun hasNext() = remaining > 0
+
+			override fun next(): Period {
+				var next = current
+				current = current.next()
+				remaining-- 
+				return next
+			}
+		}
 	}
 }
 

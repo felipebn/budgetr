@@ -19,22 +19,18 @@ class BudgetrApplication{
 		}
 		
 		val start = LocalDate.of(2019, Month.FEBRUARY, 24)
-		var period = Period(start, start.plusDays(6))
+		val period = Period(start, start.plusDays(6))
 
-		var forecastTotal = 0.0
-		0.rangeTo(8).forEach {
-			val budget = budgetService.project(period)
-			
-			forecastTotal += budget.total
-			 
-			println("Week budget ($period): ${budget.total}")
+		val forecast = budgetService.forecast(period, 8)
+		
+		forecast.budgets.forEach { budget ->
+			println("Week budget (${budget.period}): ${budget.total}")
 			budget.expenses.forEach{
 				println("${it.amount}\t${it.description}")
 			}	
-			period = period.next()
 		}
 		
-		println("Total Forecast: $forecastTotal")
+		println("Total Forecast: ${forecast.total}")
 	}
 	
 }
