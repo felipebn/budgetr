@@ -48,8 +48,15 @@ data class YearlyExpense(@Embedded override val details:ExpenseDetails,
 						 val dueMonth:Month) : PersistentExpense(){
 	
 	override fun applies(period: Period) : Boolean{
-		val dueOnYear = LocalDate.of(period.start.year, dueMonth, dueDay)
-		return period.contains(dueOnYear)
+		var realDueDate = LocalDate.of(period.start.year, dueMonth, dueDay)
+		
+		if(realDueDate < period.start){
+			realDueDate = LocalDate.of(period.end.year, dueMonth, dueDay)
+		}
+		
+		realDueDate = nextWorkDay(realDueDate)
+		
+		return period.contains(realDueDate)
 	}
 };
 
@@ -57,8 +64,15 @@ data class YearlyExpense(@Embedded override val details:ExpenseDetails,
 data class MonthlyExpense(@Embedded override val details:ExpenseDetails,
 						  val dueDay:Int) : PersistentExpense(){
 	override fun applies(period: Period) : Boolean{
-		val dueOnStartMonth = LocalDate.of(period.start.year, period.start.month, dueDay)
-		return period.contains(dueOnStartMonth)
+		var realDueDate = LocalDate.of(period.start.year, period.start.month, dueDay)
+		
+		if(realDueDate < period.start){
+			realDueDate = LocalDate.of(period.end.year, period.end.month, dueDay)
+		}
+		
+		realDueDate = nextWorkDay(realDueDate)
+		
+		return period.contains(realDueDate)
 	}
 };
 
@@ -66,6 +80,14 @@ data class MonthlyExpense(@Embedded override val details:ExpenseDetails,
 data class WeeklyExpense(@Embedded override val details:ExpenseDetails,
 						 @Enumerated val weekDay: DayOfWeek? = null) : PersistentExpense(){
 	override fun applies(period: Period) : Boolean{
+		//TODO check day of week
 		return true
 	}
 };
+
+
+fun nextWorkDay(date : LocalDate) = when(date.dayOfWeek){
+	DayOfWeek.SATURDAY -> date.plusDays(2)
+	DayOfWeek.SUNDAY -> date.plusDays(1)
+	else -> date
+}

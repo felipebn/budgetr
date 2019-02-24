@@ -18,14 +18,23 @@ class BudgetrApplication{
 			it.seedData()
 		}
 		
-		val start = LocalDate.of(2019, Month.FEBRUARY, 25);
-		val budget = budgetService.project(Period(start, start.plusDays(7)))
-		
-		println("Week budget: ${budget.totalBudget}")
-		budget.expenses.forEach{
-			println("${it.amount}\t${it.description}")
+		val start = LocalDate.of(2019, Month.FEBRUARY, 24)
+		var period = Period(start, start.plusDays(6))
+
+		var forecastTotal = 0.0
+		0.rangeTo(8).forEach {
+			val budget = budgetService.project(period)
+			
+			forecastTotal += budget.total
+			 
+			println("Week budget ($period): ${budget.total}")
+			budget.expenses.forEach{
+				println("${it.amount}\t${it.description}")
+			}	
+			period = period.next()
 		}
 		
+		println("Total Forecast: $forecastTotal")
 	}
 	
 }
