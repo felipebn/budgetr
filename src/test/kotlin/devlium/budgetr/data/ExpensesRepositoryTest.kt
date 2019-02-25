@@ -1,22 +1,13 @@
 package devlium.budgetr.data
 
-import devlium.budgetr.data.ExpenseDetails
-import devlium.budgetr.data.MonthlyExpense
-import devlium.budgetr.data.OneTimeOnlyExpense
-import devlium.budgetr.data.WeeklyExpense
-import devlium.budgetr.data.YearlyExpense
-import org.assertj.core.api.Assertions.*
+import devlium.budgetr.BaseTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.junit4.SpringRunner
 import java.time.LocalDate
 import java.time.Month
 
-@RunWith(SpringRunner::class)
-@SpringBootTest
-class ExpensesRepositoryTest {
+class ExpensesRepositoryTest : BaseTest(){
 
 	@Autowired
 	lateinit var repository:ExpensesRepository

@@ -1,13 +1,12 @@
 package devlium.budgetr
 
-import devlium.budgetr.data.Expense
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
 import java.time.LocalDate
 import java.time.Month
-import java.util.Optional
-import org.springframework.context.annotation.Bean
+import java.util.*
 
 @SpringBootApplication
 class BudgetrApplication{
