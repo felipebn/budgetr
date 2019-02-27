@@ -1,10 +1,11 @@
 package devlium.budgetr
 
 import devlium.budgetr.data.Expense
-import java.time.LocalDate
-import org.springframework.stereotype.Component
 import devlium.budgetr.data.ExpensesRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 @Component
@@ -43,9 +44,18 @@ data class Budget(	val period: Period,
 				  	val expenses:List<Expense>)
 
 data class Period(val start:LocalDate, val end:LocalDate){
+	companion object {
+	    fun fromWeekStart(referenceDate:LocalDate) : Period{
+			val from = referenceDate.minusDays(referenceDate.dayOfWeek.value.toLong())
+			val to = referenceDate.plusDays((DayOfWeek.SUNDAY.value - referenceDate.dayOfWeek.value).toLong())
+			return Period(from, to)
+		}
+	}
+
 	fun contains(date:LocalDate) : Boolean{
 		return date >= start && date < end 
 	}
+
 	fun next() : Period{
 		val s = end.plusDays(1)
 		return Period(s, s.plusDays(ChronoUnit.DAYS.between(start, end)))

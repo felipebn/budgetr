@@ -26,6 +26,13 @@ dependencies {
 	
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
 	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+
+	implementation group: 'com.graphql-java', name: 'graphql-spring-boot-starter', version: '5.0.2'
+	implementation group: 'com.graphql-java', name: 'graphql-java-tools', version: '5.2.4'
+	implementation group: 'com.graphql-java', name: 'graphql-spring-boot-starter', version: '5.0.2'
+
+
+
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.12.0'

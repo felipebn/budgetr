@@ -8,10 +8,10 @@ import javax.persistence.Embeddable
 import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.Enumerated
-import javax.persistence.Transient
 
 interface Expense{
 	fun applies(period:Period) : Boolean
+	fun applicableDateInPeriod(period: Period) : LocalDate?
 	val amount:Double
 	val description:String
 }
@@ -20,7 +20,7 @@ interface Expense{
 data class ExpenseDetails(
 	val description:String,
 	val amount: Double
-);
+)
 
 //Mapped as entity to be able to create a Repository for it
 @Entity
@@ -40,7 +40,9 @@ data class OneTimeOnlyExpense(@Embedded override val details:ExpenseDetails,
 	override fun applies(period: Period) : Boolean{
 		return period.contains(dueDate)
 	}
-};
+
+	override fun applicableDateInPeriod(period: Period): LocalDate = dueDate
+}
 
 @Entity
 data class YearlyExpense(@Embedded override val details:ExpenseDetails,
@@ -48,33 +50,37 @@ data class YearlyExpense(@Embedded override val details:ExpenseDetails,
 						 val dueMonth:Month) : PersistentExpense(){
 	
 	override fun applies(period: Period) : Boolean{
+		return period.contains(applicableDateInPeriod(period))
+	}
+
+	override fun applicableDateInPeriod(period: Period): LocalDate {
 		var realDueDate = LocalDate.of(period.start.year, dueMonth, dueDay)
-		
+
 		if(realDueDate < period.start){
 			realDueDate = LocalDate.of(period.end.year, dueMonth, dueDay)
 		}
-		
-		realDueDate = nextWorkDay(realDueDate)
-		
-		return period.contains(realDueDate)
+
+		return nextWorkDay(realDueDate)
 	}
-};
+}
 
 @Entity
 data class MonthlyExpense(@Embedded override val details:ExpenseDetails,
 						  val dueDay:Int) : PersistentExpense(){
 	override fun applies(period: Period) : Boolean{
+		return period.contains(applicableDateInPeriod(period))
+	}
+
+	override fun applicableDateInPeriod(period: Period): LocalDate {
 		var realDueDate = LocalDate.of(period.start.year, period.start.month, dueDay)
-		
+
 		if(realDueDate < period.start){
 			realDueDate = LocalDate.of(period.end.year, period.end.month, dueDay)
 		}
-		
-		realDueDate = nextWorkDay(realDueDate)
-		
-		return period.contains(realDueDate)
+
+		return nextWorkDay(realDueDate)
 	}
-};
+}
 
 @Entity
 data class WeeklyExpense(@Embedded override val details:ExpenseDetails,
@@ -83,10 +89,19 @@ data class WeeklyExpense(@Embedded override val details:ExpenseDetails,
 		//TODO check day of week
 		return true
 	}
-};
+
+	override fun applicableDateInPeriod(period: Period): LocalDate? {
+		return when(weekDay){
+			null -> null
+			DayOfWeek.SUNDAY -> period.start
+			DayOfWeek.SATURDAY -> period.end
+			else -> period.start.plusDays(weekDay.value.toLong())
+		}
+	}
+}
 
 
-fun nextWorkDay(date : LocalDate) = when(date.dayOfWeek){
+fun nextWorkDay(date : LocalDate) : LocalDate = when(date.dayOfWeek){
 	DayOfWeek.SATURDAY -> date.plusDays(2)
 	DayOfWeek.SUNDAY -> date.plusDays(1)
 	else -> date

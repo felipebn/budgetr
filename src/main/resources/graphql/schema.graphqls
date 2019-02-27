@@ -1,0 +1,17 @@
+type Query{
+    currentBudget: Budget
+}
+
+type Budget {
+    start: String!
+    end: String!
+    total: Float!
+    expenses: [Expense]!
+}
+
+type Expense{
+    description: String!
+    #expenseType: String! TODO add later!
+    plannedDate: String
+    amount: Float!
+}
