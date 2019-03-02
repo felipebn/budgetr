@@ -1,5 +1,6 @@
 type Query{
     currentBudget: Budget
+    nextBudget: Budget
 }
 
 type Budget {
