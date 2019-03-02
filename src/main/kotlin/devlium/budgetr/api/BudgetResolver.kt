@@ -24,6 +24,9 @@ class BudgetResolver(
         return ResolvedBudget(budget)
     }
 
+    fun forecast(length:Int): ResolvedForecast{
+        TODO("load forecast from service, populate dtos")
+    }
 }
 
 data class ResolvedBudget(
@@ -50,4 +53,16 @@ data class ResolvedExpense(
         val description: String,
         val plannedDate: LocalDate?,
         val amount: Double
+)
+
+data class ResolvedForecast(
+        val start:LocalDate,
+        val end:LocalDate,
+        val forecatsItems : List<ResolvedForecastItem>
+)
+
+data class ResolvedForecastItem(
+        val description:String,
+        val budgeted: Double,
+        val balance: Double
 )
