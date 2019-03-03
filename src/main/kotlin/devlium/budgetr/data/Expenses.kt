@@ -14,12 +14,14 @@ interface Expense{
 	fun applicableDateInPeriod(period: Period) : LocalDate?
 	val amount:Double
 	val description:String
+	val firstOccurrence:LocalDate
 }
 
 @Embeddable
 data class ExpenseDetails(
 	val description:String,
-	val amount: Double
+	val amount: Double,
+	val firstOccurrence : LocalDate = LocalDate.EPOCH
 )
 
 //Mapped as entity to be able to create a Repository for it
@@ -32,6 +34,9 @@ abstract class PersistentExpense : BaseEntity() , Expense{
 	
 	override val description: String
 		get() = details.description
+
+	override val firstOccurrence: LocalDate
+		get() = details.firstOccurrence
 }
 
 @Entity

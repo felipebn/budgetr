@@ -25,7 +25,13 @@ class BudgetResolver(
     }
 
     fun forecast(length:Int): ResolvedForecast{
-        TODO("load forecast from service, populate dtos")
+        val period = Period.fromWeekStart(LocalDate.now())
+        val forecast = budgetServiceBean.forecast(period, length)
+        return ResolvedForecast(
+                start = period.start,
+                end = forecast.budgets.last().period.end,
+                forecastItems = forecast.budgets.map { ResolvedForecastItem(it) }
+        )
     }
 }
 
@@ -58,11 +64,17 @@ data class ResolvedExpense(
 data class ResolvedForecast(
         val start:LocalDate,
         val end:LocalDate,
-        val forecatsItems : List<ResolvedForecastItem>
+        val forecastItems : List<ResolvedForecastItem>
 )
 
 data class ResolvedForecastItem(
         val description:String,
         val budgeted: Double,
         val balance: Double
-)
+){
+    constructor(budget : Budget) : this(
+            description = budget.period.toString(),
+            budgeted = budget.total,
+            balance = 0.0
+    )
+}

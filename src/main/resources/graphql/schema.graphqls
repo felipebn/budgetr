@@ -1,6 +1,7 @@
 type Query{
     currentBudget: Budget
     nextBudget: Budget
+    forecast(length:Int!) : Forecast
 }
 
 type Budget {
@@ -15,4 +16,16 @@ type Expense{
     #expenseType: String! TODO add later!
     plannedDate: String
     amount: Float!
+}
+
+type Forecast {
+    start: String!
+    end: String!
+    forecastItems: [ForecastItem]!
+}
+
+type ForecastItem {
+    description: String!
+    budgeted: Float!
+    balance: Float!
 }

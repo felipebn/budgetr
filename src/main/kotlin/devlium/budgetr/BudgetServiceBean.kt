@@ -17,9 +17,13 @@ class BudgetServiceBean {
 	fun project(period:Period) : Budget{
 		val expenses = expensesRepository.findAll()
 		
-		val applicableExpenses = expenses.filter{
-			it.applies(period)
-		}.toList()
+		val applicableExpenses = expenses
+				.filter{
+					it.firstOccurrence <= period.end
+				}
+				.filter{
+					it.applies(period)
+				}.toList()
 		
 		val total = applicableExpenses.map{ it.amount }.sum()
 		
@@ -47,7 +51,7 @@ data class Period(val start:LocalDate, val end:LocalDate){
 	companion object {
 	    fun fromWeekStart(referenceDate:LocalDate) : Period{
 			val from = referenceDate.minusDays(referenceDate.dayOfWeek.value.toLong())
-			val to = referenceDate.plusDays((DayOfWeek.SUNDAY.value - referenceDate.dayOfWeek.value).toLong())
+			val to = referenceDate.plusDays((DayOfWeek.SATURDAY.value - referenceDate.dayOfWeek.value).toLong())
 			return Period(from, to)
 		}
 	}
@@ -69,12 +73,16 @@ data class Period(val start:LocalDate, val end:LocalDate){
 			override fun hasNext() = remaining > 0
 
 			override fun next(): Period {
-				var next = current
+				val next = current
 				current = current.next()
 				remaining-- 
 				return next
 			}
 		}
+	}
+
+	override fun toString(): String {
+		return "$start to $end"
 	}
 }
 
