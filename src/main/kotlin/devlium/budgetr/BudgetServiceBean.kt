@@ -50,9 +50,14 @@ data class Budget(	val period: Period,
 data class Period(val start:LocalDate, val end:LocalDate){
 	companion object {
 	    fun fromWeekStart(referenceDate:LocalDate) : Period{
-			val from = referenceDate.minusDays(referenceDate.dayOfWeek.value.toLong())
-			val to = referenceDate.plusDays((DayOfWeek.SATURDAY.value - referenceDate.dayOfWeek.value).toLong())
-			return Period(from, to)
+			val from = when(referenceDate.dayOfWeek){
+                DayOfWeek.SUNDAY -> referenceDate
+                else -> referenceDate.minusDays(referenceDate.dayOfWeek.value.toLong())
+            }
+
+			val to = from.plusDays(6)
+
+            return Period(from, to)
 		}
 	}
 
