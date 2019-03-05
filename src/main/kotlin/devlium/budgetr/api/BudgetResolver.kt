@@ -3,6 +3,7 @@ package devlium.budgetr.api
 import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import devlium.budgetr.Budget
 import devlium.budgetr.BudgetServiceBean
+import devlium.budgetr.ForecastStep
 import devlium.budgetr.Period
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -29,8 +30,8 @@ class BudgetResolver(
         val forecast = budgetServiceBean.forecast(period, length)
         return ResolvedForecast(
                 start = period.start,
-                end = forecast.budgets.last().period.end,
-                forecastItems = forecast.budgets.map { ResolvedForecastItem(it) }
+                end = forecast.steps.last().budget.period.end,
+                forecastItems = forecast.steps.map { ResolvedForecastItem(it) }
         )
     }
 }
@@ -72,9 +73,9 @@ data class ResolvedForecastItem(
         val budgeted: Double,
         val balance: Double
 ){
-    constructor(budget : Budget) : this(
-            description = budget.period.toString(),
-            budgeted = budget.total,
-            balance = 0.0
+    constructor(forecastStep : ForecastStep) : this(
+            description = forecastStep.budget.period.toString(),
+            budgeted = forecastStep.budget.total,
+            balance = forecastStep.estimatedBalance
     )
 }

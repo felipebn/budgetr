@@ -1,5 +1,6 @@
 package devlium.budgetr
 
+import devlium.budgetr.data.RealBalanceSnapshotRepository
 import devlium.budgetr.data.Expense
 import devlium.budgetr.data.ExpensesRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,6 +14,9 @@ class BudgetServiceBean {
 	
 	@Autowired
 	lateinit var expensesRepository:ExpensesRepository
+
+	@Autowired
+	lateinit var realBalanceSnapshotRepository: RealBalanceSnapshotRepository
 	
 	fun project(period:Period) : Budget{
 		val expenses = expensesRepository.findAll()
@@ -33,15 +37,27 @@ class BudgetServiceBean {
 	fun forecast(startPeriod : Period, forecastLength : Int) : Forecast{
 		val budgets = startPeriod.iterator(forecastLength).asSequence().map {
 			project(it)
+		}
+
+		var balance = realBalanceSnapshotRepository.findFirstByDateLessThanEqual(startPeriod.start).map { it.total }.orElse(0.0)
+
+		val forecastSteps = budgets.map{
+			val estimatedBalance = balance - it.total
+			balance = estimatedBalance
+
+			ForecastStep(it, estimatedBalance)
 		}.toList()
 		
-		return Forecast(forecastLength, budgets.map{it.total}.sum() , budgets)
+		return Forecast(forecastLength, budgets.map{it.total}.sum() , forecastSteps)
 	}
 }
 
 data class Forecast(val forecastLength: Int,
 					val total: Double,
-					val budgets : List<Budget>)
+					val steps : List<ForecastStep>)
+
+data class ForecastStep(val budget: Budget,
+						val estimatedBalance: Double)
 
 data class Budget(	val period: Period,
 				  	val total:Double,
