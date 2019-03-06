@@ -10,5 +10,5 @@ import javax.transaction.Transactional
 @Transactional
 interface RealBalanceSnapshotRepository : JpaRepository<RealBalanceSnapshot, UUID>{
 
-    fun findFirstByDateLessThanEqual(date: LocalDate) : Optional<RealBalanceSnapshot>
+    fun findFirstByDateLessThanEqualOrderByDateDesc(date: LocalDate) : Optional<RealBalanceSnapshot>
 }

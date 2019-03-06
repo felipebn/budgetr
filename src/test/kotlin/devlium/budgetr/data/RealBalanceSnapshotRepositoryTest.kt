@@ -23,11 +23,11 @@ class RealBalanceSnapshotRepositoryTest : BaseTest() {
 
         repository.flush()
 
-        assertThat(repository.findFirstByDateLessThanEqual(day9)).isNotEmpty
-        assertThat(repository.findFirstByDateLessThanEqual(day9).get().total).isEqualTo(40.0)
+        assertThat(repository.findFirstByDateLessThanEqualOrderByDateDesc(day9)).isNotEmpty
+        assertThat(repository.findFirstByDateLessThanEqualOrderByDateDesc(day9).get().total).isEqualTo(40.0)
 
-        assertThat(repository.findFirstByDateLessThanEqual(LocalDate.now())).isNotEmpty
-        assertThat(repository.findFirstByDateLessThanEqual(LocalDate.now()).get().total).isEqualTo(30.0)
+        assertThat(repository.findFirstByDateLessThanEqualOrderByDateDesc(LocalDate.now())).isNotEmpty
+        assertThat(repository.findFirstByDateLessThanEqualOrderByDateDesc(LocalDate.now()).get().total).isEqualTo(30.0)
     }
 
 }

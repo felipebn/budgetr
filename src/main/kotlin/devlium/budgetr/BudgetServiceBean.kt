@@ -39,7 +39,7 @@ class BudgetServiceBean {
 			project(it)
 		}
 
-		var balance = realBalanceSnapshotRepository.findFirstByDateLessThanEqual(startPeriod.start).map { it.total }.orElse(0.0)
+		var balance = realBalanceSnapshotRepository.findFirstByDateLessThanEqualOrderByDateDesc(startPeriod.start).map { it.total }.orElse(0.0)
 
 		val forecastSteps = budgets.map{
 			val estimatedBalance = balance - it.total
