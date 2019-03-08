@@ -20,7 +20,7 @@ data class IncomeDetails(
 )
 
 @Entity
-abstract class PersistentIncome : Income{
+abstract class PersistentIncome : BaseEntity() , Income{
     abstract val details : IncomeDetails
 
     override val amount: Double
