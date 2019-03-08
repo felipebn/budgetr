@@ -1,27 +1,56 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import PeriodBudgetPanel from './components/PeriodBudgetPanel';
+import ForecastPanel from './components/ForecastPanel';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
+class App extends Component{
+  
+  render(){
+    var currentBudget = {
+      start:'24/02/2019', 
+      end:'02/03/2019',
+      total: 290,
+      expenses: [
+        this.createBudgetItem('example', 'Weekly', 'N/A', 80.00),
+        this.createBudgetItem('example', 'Yearly', '25/02/2019', 200.00),
+        this.createBudgetItem('example', 'Monthly', '27/02/2019', 100.00),
+      ]
+    }
+    
+    var forecast = {
+      start:'24/02/2019', 
+      end:'06/04/2019',
+      items:[
+        this.createForecastItem('24/02 to 02/03', -4190, 4500),
+        this.createForecastItem('03/03 to 09/03', -800, 3700),
+        this.createForecastItem('10/03 to 16/03', -260, 3400),
+        this.createForecastItem('17/03 to 23/03', -275, 3150),
+        this.createForecastItem('24/03 to 30/03', -280, 4900),
+        this.createForecastItem('31/03 to 06/04', -600, 4300),
+      ]
+    }
+    
+    return (<div className="container">
+          <br/>
+          <PeriodBudgetPanel
+            startDate={currentBudget.start} 
+            endDate={currentBudget.end} 
+            total={currentBudget.total}
+            budgetItems={currentBudget.expenses}/>
+          <ForecastPanel
+            startDate={forecast.start} 
+            endDate={forecast.end}
+            forecastItems={forecast.items}
+            balanceEstimations={forecast.balanceEstimations}
+            />
+    </div>);
+  }
+  
+  createBudgetItem(description, type, date, amount){
+    return {description, type, date, amount}
+  }
+  
+  createForecastItem(description, amount, balance){
+    return {description, amount, balance}
   }
 }
 
