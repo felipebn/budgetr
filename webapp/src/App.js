@@ -5,17 +5,6 @@ import ForecastPanel from './components/ForecastPanel';
 class App extends Component{
   
   render(){
-    var currentBudget = {
-      start:'24/02/2019', 
-      end:'02/03/2019',
-      total: 290,
-      expenses: [
-        this.createBudgetItem('example', 'Weekly', 'N/A', 80.00),
-        this.createBudgetItem('example', 'Yearly', '25/02/2019', 200.00),
-        this.createBudgetItem('example', 'Monthly', '27/02/2019', 100.00),
-      ]
-    }
-    
     var forecast = {
       start:'24/02/2019', 
       end:'06/04/2019',
@@ -31,11 +20,7 @@ class App extends Component{
     
     return (<div className="container">
           <br/>
-          <PeriodBudgetPanel
-            startDate={currentBudget.start} 
-            endDate={currentBudget.end} 
-            total={currentBudget.total}
-            budgetItems={currentBudget.expenses}/>
+          <PeriodBudgetPanel/>
           <ForecastPanel
             startDate={forecast.start} 
             endDate={forecast.end}

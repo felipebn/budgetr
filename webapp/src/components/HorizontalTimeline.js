@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {formatMoney} from '../Utils'
+import {formatMoney} from '../utils'
 
 class HorizontalTimeline extends Component{
     render(){
