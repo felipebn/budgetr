@@ -5,6 +5,7 @@ import java.time.LocalDate
 import javax.persistence.Embeddable
 import javax.persistence.Embedded
 import javax.persistence.Entity
+import javax.persistence.Table
 
 interface Income{
     fun applies(period: Period) : Boolean
@@ -31,6 +32,7 @@ abstract class PersistentIncome : BaseEntity() , Income{
 }
 
 @Entity
+@Table(name="monthly_income")
 data class MonthlyIncome(
     @Embedded override val details: IncomeDetails,
     val paymentDay: Int,
@@ -52,6 +54,7 @@ data class MonthlyIncome(
 }
 
 @Entity
+@Table(name="one_time_income")
 data class OneTimeIncome(
     @Embedded override val details: IncomeDetails,
     val paymentDate: LocalDate
