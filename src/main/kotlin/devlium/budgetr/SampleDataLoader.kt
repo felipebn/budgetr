@@ -51,11 +51,16 @@ class SampleDataLoader : SeedDataLoader {
     }
 
     fun seedIncomes(){
+        var monthlyIncomes = listOf(
+            MonthlyIncome(IncomeDetails("Salary", 3000.0), 27, LocalDate.of(2019, 1, 27))
+        )
 
+        incomeRepository.saveAll(monthlyIncomes)
     }
 
     fun seedRealBalances(){
-
+        var realBalance = RealBalanceSnapshot(total = 1500.00, date = LocalDate.of(2019, 8, 1))
+        realBalanceSnapshotRepository.save(realBalance)
     }
 }
 

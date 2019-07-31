@@ -4,8 +4,9 @@
   "private": true,
   "dependencies": {
     "apollo-boost": "^0.3.1",
+    "dart-sass": "^1.22.9",
     "graphql": "^14.1.1",
-    "node-sass": "^4.11.0",
+    "node-sass": "npm:sass@^1.22.9",
     "react": "^16.8.4",
     "react-apollo": "^2.5.2",
     "react-dom": "^16.8.4",
@@ -26,5 +27,5 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "proxy": "http://localhost:8080"
+  "proxy": "http://localhost:9090"
 }
