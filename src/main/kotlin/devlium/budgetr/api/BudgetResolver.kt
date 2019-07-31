@@ -26,7 +26,7 @@ class BudgetResolver(
     }
 
     fun forecast(length:Int): ResolvedForecast{
-        val period = Period.fromWeekStart(LocalDate.now())
+        val period = Period.fromWeekStart(LocalDate.now().plusDays(7))
         val forecast = budgetServiceBean.forecast(period, length)
         return ResolvedForecast(
                 start = period.start,
@@ -45,7 +45,7 @@ data class ResolvedBudget(
     constructor(budget:Budget) : this(
         start = budget.period.start,
         end = budget.period.end,
-        total = budget.total,
+        total = budget.totalExpense,
         expenses = budget.expenses.map{
             ResolvedExpense(
                 description = it.description,
@@ -75,7 +75,7 @@ data class ResolvedForecastItem(
 ){
     constructor(forecastStep : ForecastStep) : this(
             description = forecastStep.budget.period.toString(),
-            budgeted = forecastStep.budget.total,
+            budgeted = forecastStep.budget.totalExpense,
             balance = forecastStep.estimatedBalance
     )
 }

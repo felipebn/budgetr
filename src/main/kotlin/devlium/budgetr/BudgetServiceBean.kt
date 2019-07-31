@@ -3,6 +3,8 @@ package devlium.budgetr
 import devlium.budgetr.data.RealBalanceSnapshotRepository
 import devlium.budgetr.data.Expense
 import devlium.budgetr.data.ExpensesRepository
+import devlium.budgetr.data.IncomeRepository
+import devlium.budgetr.system.logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.time.DayOfWeek
@@ -11,16 +13,24 @@ import java.time.temporal.ChronoUnit
 
 @Component
 class BudgetServiceBean {
-	
+    companion object{
+        val log by logger()
+    }
+
 	@Autowired
 	lateinit var expensesRepository:ExpensesRepository
+
+    @Autowired
+    lateinit var incomesRepository:IncomeRepository;
 
 	@Autowired
 	lateinit var realBalanceSnapshotRepository: RealBalanceSnapshotRepository
 	
 	fun project(period:Period) : Budget{
 		val expenses = expensesRepository.findAll()
-		
+
+        log.info("Loaded expenses: {}", expenses)
+
 		val applicableExpenses = expenses
 				.filter{
 					it.firstOccurrence <= period.end
@@ -28,27 +38,39 @@ class BudgetServiceBean {
 				.filter{
 					it.applies(period)
 				}.toList()
+
+        log.info("Applicable expenses: {}", expenses)
+
+		val totalExpense = applicableExpenses.map{ it.amount }.sum()
+
+        val incomes = incomesRepository.findAll()
+
+        val totalIncome = incomes.filter{
+            it.applies(period)
+        }.map{
+            it.amount
+        }.sum()
 		
-		val total = applicableExpenses.map{ it.amount }.sum()
-		
-		return Budget(period, total, applicableExpenses)
+		return Budget(period, totalIncome, totalExpense, applicableExpenses)
 	}
 	
 	fun forecast(startPeriod : Period, forecastLength : Int) : Forecast{
 		val budgets = startPeriod.iterator(forecastLength).asSequence().map {
 			project(it)
-		}
+		}.toList()
 
-		var balance = realBalanceSnapshotRepository.findFirstByDateLessThanEqualOrderByDateDesc(startPeriod.start).map { it.total }.orElse(0.0)
+        var previouslyEstimatedBalance = realBalanceSnapshotRepository.findFirstByDateLessThanEqualOrderByDateDesc(startPeriod.start)
+            .map {snapshot -> snapshot.total }
+            .orElse(0.0)
 
 		val forecastSteps = budgets.map{
-			val estimatedBalance = balance - it.total
-			balance = estimatedBalance
+			val estimatedBalance = previouslyEstimatedBalance + it.totalIncome - it.totalExpense
+            previouslyEstimatedBalance = estimatedBalance
 
 			ForecastStep(it, estimatedBalance)
 		}.toList()
 		
-		return Forecast(forecastLength, budgets.map{it.total}.sum() , forecastSteps)
+		return Forecast(forecastLength, budgets.map{it.totalExpense}.sum() , forecastSteps)
 	}
 }
 
@@ -59,9 +81,10 @@ data class Forecast(val forecastLength: Int,
 data class ForecastStep(val budget: Budget,
 						val estimatedBalance: Double)
 
-data class Budget(	val period: Period,
-				  	val total:Double,
-				  	val expenses:List<Expense>)
+data class Budget(val period: Period,
+                  val totalIncome:Double,
+                  val totalExpense:Double,
+                  val expenses:List<Expense>)
 
 data class Period(val start:LocalDate, val end:LocalDate){
 	companion object {

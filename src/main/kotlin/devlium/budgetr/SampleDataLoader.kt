@@ -1,14 +1,21 @@
 package devlium.budgetr
 
 import devlium.budgetr.data.*
+import devlium.budgetr.system.logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
+import org.springframework.stereotype.Component
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
 
 @Profile(value=["development"])
+@Component
 class SampleDataLoader : SeedDataLoader {
+
+    companion object{
+        val log by logger()
+    }
 
     @Autowired
     lateinit var expensesRepository: ExpensesRepository
@@ -26,6 +33,7 @@ class SampleDataLoader : SeedDataLoader {
     }
 
     fun seedExpenses(){
+        log.info("Seeding expenses...")
         var monthExpenses = listOf(
              MonthlyExpense(ExpenseDetails(description = "Energy", amount = 30.0, firstOccurrence = LocalDate.of(2019, 1, 1)),3)
             ,MonthlyExpense(ExpenseDetails(description = "Water", amount = 20.0, firstOccurrence = LocalDate.of(2019, 1, 1)),5)
@@ -51,6 +59,7 @@ class SampleDataLoader : SeedDataLoader {
     }
 
     fun seedIncomes(){
+        log.info("Seeding incomes...")
         var monthlyIncomes = listOf(
             MonthlyIncome(IncomeDetails("Salary", 3000.0), 27, LocalDate.of(2019, 1, 27))
         )
@@ -59,7 +68,8 @@ class SampleDataLoader : SeedDataLoader {
     }
 
     fun seedRealBalances(){
-        var realBalance = RealBalanceSnapshot(total = 1500.00, date = LocalDate.of(2019, 8, 1))
+        log.info("Seeding real balances...")
+        var realBalance = RealBalanceSnapshot(total = 1840.00, date = LocalDate.of(2019, 8, 3))
         realBalanceSnapshotRepository.save(realBalance)
     }
 }
